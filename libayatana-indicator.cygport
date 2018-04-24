@@ -1,0 +1,64 @@
+inherit gnome2
+
+NAME="libayatana-indicator"
+VERSION=0.6.2
+RELEASE=1
+CATEGORY="Libs"
+SUMMARY="Ayatana Indicator core library"
+DESCRIPTION="Application Indicators are a GNOME implementation of the
+StatusNotifierItem Specification (SNI) that was originally submitted to
+freedesktop.org by KDE. The Ayatana Indicator project intends to become
+the new upstream for application indicators and associated projects with a
+focus on making Ayatana Indicators a desktop agnostic technology."
+HOMEPAGE="https://ayatanaindicators.github.io/"
+SRC_URI="https://github.com/AyatanaIndicators/libayatana-indicator/archive/${VERSION}/libayatana-indicator-${VERSION}.tar.gz"
+SRC_DIR="libayatana-indicator-${VERSION}"
+PATCH_URI="0.6.2-tests-cygwin.patch"
+
+PKG_NAMES="libayatana-indicator7 libayatana-indicator-devel
+	   libayatana-indicator3_7 libayatana-indicator3-devel
+	   libayatana-indicator-common libayatana-indicator3-tools"
+libayatana_indicator7_REQUIRES="${NAME}-common"
+libayatana_indicator7_CONTENTS="
+	usr/bin/cygayatana-indicator-7.dll
+"
+libayatana_indicator_devel_CONTENTS="
+	usr/include/libayatana-indicator-0.4/
+	usr/lib/libayatana-indicator.dll.a
+	usr/lib/pkgconfig/ayatana-indicator-0.4.pc
+"
+libayatana_indicator3_7_REQUIRES="${NAME}-common"
+libayatana_indicator3_7_CONTENTS="
+	usr/bin/cygayatana-indicator3-7.dll
+"
+libayatana_indicator3_devel_CONTENTS="
+	usr/include/libayatana-indicator3-0.4/
+	usr/lib/libayatana-indicator3.dll.a
+	usr/lib/pkgconfig/ayatana-indicator3-0.4.pc
+"
+libayatana_indicator_common_CONTENTS="
+	usr/share/doc/${NAME}
+	usr/share/${NAME}
+"
+libayatana_indicator3_tools_CATEGORY="Devel"
+libayatana_indicator3_tools_CONTENTS="usr/libexec/ayatana-indicator-loader3.exe"
+
+src_compile() {
+	cd ${S}
+	gnome2_autoreconf
+
+	mkdir -p ${B}/gtk2
+	cd ${B}/gtk2
+	gnome2_compile --with-gtk=2
+
+	mkdir -p ${B}/gtk3
+	cd ${B}/gtk3
+	gnome2_compile --with-gtk=3
+}
+
+src_install() {
+	cd ${B}/gtk3
+	cyginstall
+	cd ${B}/gtk2
+	cyginstall
+}
